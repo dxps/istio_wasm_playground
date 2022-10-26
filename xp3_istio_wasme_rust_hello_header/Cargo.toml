@@ -1,0 +1,15 @@
+[package]
+name = "xp3_istio_wasme_rust_hello_header"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log = "0.4.17"
+proxy-wasm = "0.2.0"
+
+# This is a dynamically linked library.
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
