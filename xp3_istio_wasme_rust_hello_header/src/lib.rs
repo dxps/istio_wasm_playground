@@ -1,4 +1,4 @@
-use log::trace;
+use log::debug;
 use proxy_wasm::traits::*;
 use proxy_wasm::types::*;
 
@@ -30,7 +30,7 @@ impl Context for HttpHeaders {}
 impl HttpContext for HttpHeaders {
     fn on_http_request_headers(&mut self, _: usize, _: bool) -> Action {
         for (name, value) in &self.get_http_request_headers() {
-            trace!("#{} -> {}: {}", self.context_id, name, value);
+            debug!("#{} -> {}: {}", self.context_id, name, value);
         }
 
         match self.get_http_request_header(":path") {
@@ -50,17 +50,23 @@ impl HttpContext for HttpHeaders {
         let mut authority = "";
         let headers = self.get_http_request_headers();
         for (name, value) in &headers {
-            trace!("#{} <- {}: {}", self.context_id, name, value);
+            debug!("#{} <- {}: {}", self.context_id, name, value);
             if name == "authority" {
                 authority = value.as_str();
             }
         }
         self.set_http_response_header("x-hello", Some(&format!("Hello {}", authority)));
-        self.set_http_response_header("x-filter", Some("xp3_istio_wasme_rust_hello_header"));
+        self.set_http_response_header(
+            "",
+            Some(&format!(
+                "xp3_istio_wasme_rust_hello_header #{}",
+                self.context_id
+            )),
+        );
         Action::Continue
     }
 
     fn on_log(&mut self) {
-        trace!("#{} completed.", self.context_id);
+        debug!("#{} completed.", self.context_id);
     }
 }

@@ -8,4 +8,4 @@ spec:
     matchLabels:
       app: echoserver
   pluginName: istio_wasme_rust_hello
-  url: oci://webassemblyhub.io/dxps/xp3_istio_wasme_rust_hello_header:v0.1.1
+  url: oci://webassemblyhub.io/dxps/xp3_istio_wasme_rust_hello_header:v0.1.3

@@ -37,15 +37,23 @@ Steps:
 - `k delete envoyfilter,wasmplugin -n default --all`
 - `k apply -f echoserver_wasmplugin.yaml`
 
-Note that the version (tag) in `echoserver_wasmplugin.yaml` needs to be kept in sync with what's being used in the building phase above.
+Note that the version (tag) in `echoserver_wasmplugin.yaml` file needs to be kept in sync with what's being built and pushed to Webassembly Hub.
 
 <br/>
 
 ### Usage
 
 From the usage perspective, here are the options:
-- Use `curl -v http://localhost:9080` and you'll see `x-filter` and `x-hello` headers in the response, as provided by this plugin.
-- Use `curl -v http://localhost:9080/hello` and besides these two headers you'll see that the response is provided by this plugin, not even reaching the target service.
+- Use `curl -v http://localhost:9080` and you'll see `x-filtered-by` and `x-hello` headers in the response, as provided by this plugin.
+- Use `curl -v http://localhost:9080/hello` and you'll see that, besides these two headers, the response is provided by this plugin, not even reaching the target service.
 - Use `curl -v http://localhost:9080/hello -H "authority: whatever"` to see additionally that the value of that request header is reflected back in the `x-hello` response header.
+
+<br/>
+
+### Logging
+
+Note that by default the Envoy that runs into the `istio-proxy` container has the `info` logging level. If you want to see those debug level statements that are logged by the plugin, you need to update the logging level.<br/>
+For this, use `istioctl pc log echoserver-v1-fcd7dc747-2ssm8 --level wasm:debug`<br/>
+That `echoserver-v1-fcd7dc747-2ssm8` is just one of the pods where the sample app runs.
 
 <br/>
