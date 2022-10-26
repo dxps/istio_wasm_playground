@@ -1,0 +1,25 @@
+[package]
+name = "istio_wasme_rust_hello"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+wee-alloc = ["wee_alloc"]
+
+
+[dependencies]
+log = "0.4.17"
+proxy-wasm = "0.1.4"
+wee_alloc = { version = "0.4.5", optional = true }
+
+
+[lib]
+path = "filter.rs"
+crate-type = ["cdylib"]
+
+[package.metadata.raze]
+package_aliases_dir = "bazel/cargo"
+workspace_path = "//bazel/cargo"
+genmode = "Remote"

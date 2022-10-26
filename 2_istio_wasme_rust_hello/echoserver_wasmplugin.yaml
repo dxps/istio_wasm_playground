@@ -1,0 +1,12 @@
+apiVersion: extensions.istio.io/v1alpha1
+kind: WasmPlugin
+metadata:
+  name: echoserver-wasm-filter
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: echoserver
+  pluginName: istio_wasme_rust_hello
+  url: oci://webassemblyhub.io/dxps/istio_wasme_rust_hello:v0.2
+
