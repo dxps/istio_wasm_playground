@@ -6,9 +6,14 @@ This experiment showcases how a WASM based extension of Istio's Envoy proxy can 
 
 ### Prerequisites
 
-1. Have a local k3d cluster available.
+1. Have a local k3d cluster available
+   1. Without its own (Traefik) provided gateway, since Istio's Ingress will be used.
+      `k3d cluster create iiac --servers 1 --agents 3 --port 9080:80@loadbalancer --port 9443:443@loadbalancer --api-port 6443 --k3s-arg="--disable=traefik@server:0"`
+
 2. Have Istio installed using its `default` profile<br/>
-   (tested with ver 1.15.1, available at the time of this writing)
+   Tested with ver 1.15.1, available at the time of this writing.<br/>
+   `istioctl install --set profile=default`
+   
 3. Have `echoserver` installed, which means:
    1. Deployed: `k apply -f echoserver_deploy.yaml`
    2. Exposed in the cluster: `k apply -f echoserver_svc.yaml`
