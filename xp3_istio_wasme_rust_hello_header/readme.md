@@ -6,14 +6,14 @@ This experiment showcases how a WASM based extension of Istio's Envoy proxy can 
 
 ### Prerequisites
 
-1. Have a local k3d cluster available
-   1. Without its own (Traefik) provided gateway, since Istio's Ingress will be used.
-      `k3d cluster create iiac --servers 1 --agents 3 --port 9080:80@loadbalancer --port 9443:443@loadbalancer --api-port 6443 --k3s-arg="--disable=traefik@server:0"`
+1. Have a local k3d cluster available.<br/>
+   Without k3d provided (Traefik) gateway, since Istio's Ingress will be used:
+      `k3d cluster create iiac --servers 1 --agents 3 --port 9080:80@loadbalancer --port 9443:443@loadbalancer --api-port 6443 --k3s-arg="--disable=traefik@server:0"`<br/>
 
-2. Have Istio installed using its `default` profile<br/>
+2. Have Istio installed using its `default` profile:<br/>
+   `istioctl install --set profile=default`<br/>
    Tested with ver 1.15.1, available at the time of this writing.<br/>
-   `istioctl install --set profile=default`
-   
+
 3. Have `echoserver` installed, which means:
    1. Deployed: `k apply -f echoserver_deploy.yaml`
    2. Exposed in the cluster: `k apply -f echoserver_svc.yaml`
@@ -24,7 +24,7 @@ This experiment showcases how a WASM based extension of Istio's Envoy proxy can 
 
 ### Building
 
-Briefly the steps:
+Briefly, the steps are as follows:
 - `cargo build --target wasm32-unknown-unknown --release`
 - `cp target/wasm32-unknown-unknown/release/xp3_istio_wasme_rust_hello_header.wasm .`
 - `wasme build precompiled xp3_istio_wasme_rust_hello_header.wasm --tag webassemblyhub.io/dxps/xp3_istio_wasme_rust_hello_header:v0.1`
@@ -39,7 +39,7 @@ Notes:
 ### Deployment
 
 Steps:
-- `k delete envoyfilter,wasmplugin -n default --all`
+- `k delete wasmplugin -n default --all`
 - `k apply -f echoserver_wasmplugin.yaml`
 
 Note that the version (tag) in `echoserver_wasmplugin.yaml` file needs to be kept in sync with what's being built and pushed to Webassembly Hub.
