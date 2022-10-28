@@ -7,12 +7,19 @@ This experiment showcases how a WASM based extension of Istio's Envoy proxy can 
 ### Prerequisites
 
 1. Have a local k3d cluster available.<br/>
-   Without k3d provided (Traefik) gateway, since Istio's Ingress will be used:
-      `k3d cluster create iiac --servers 1 --agents 3 --port 9080:80@loadbalancer --port 9443:443@loadbalancer --api-port 6443 --k3s-arg="--disable=traefik@server:0"`<br/>
+   Without k3d provided (Traefik) gateway, since Istio's Ingress will be used:<br/>
+   ```shell
+   k3d cluster create iiac --servers 1 --agents 3                                    \
+                           --port 9080:80@loadbalancer --port 9443:443@loadbalancer  \
+                           --api-port 6443                                           \
+                           --k3s-arg="--disable=traefik@server:0"
+   ```
+   <br/>
 
 2. Have Istio installed using its `default` profile:<br/>
    `istioctl install --set profile=default`<br/>
-   Tested with ver 1.15.1, available at the time of this writing.<br/>
+   Tested with ver 1.15.1, available at the time of this writing.
+   <br/><br/>
 
 3. Have `echoserver` installed, which means:
    1. Deployed: `k apply -f echoserver_deploy.yaml`
@@ -32,7 +39,7 @@ Briefly, the steps are as follows:
 - `wasme push webassemblyhub.io/dxps/xp3_istio_wasme_rust_hello_header:v0.1`
 
 Notes:
-- `runtime-config.json` file is being fetched from a generated asset using `wasme init . --language=rust --platform istio --platform-version 1.9.x`.
+- `runtime-config.json` file was being copied from the generated outcome of `wasme init . --language=rust --platform istio --platform-version 1.9.x`.
 
 <br/>
 
