@@ -26,3 +26,49 @@ For each request, a context object gets created. There are three types of contex
 Shared data is an in-memory key-value store, specified by the Proxy-Wasm ABI and provided by the proxy. Each VM contains a shared datastore.
 
 The data exchanged between the host and VM is done in binary format, therefore, it requires serialization and deserialization.
+
+<br/>
+
+---
+
+### Prereqs
+
+These are the same as in experiment no. 3 (in `xp3_` sibling location).
+
+### Build & Publish
+
+Use `make tag=v0.1 all` as an example (specific to my dxps account).
+
+Note that the `tag`'s value must be reflected in `echoserver_wasmplugin.yaml` file.
+
+<br/>
+
+### Deploy
+
+Use `k replace -f echoserver_wasmplugin.yaml` to "install" this plugin.
+
+<br/>
+
+### Usage / Test
+
+From the usage perspective, here are the options:
+- Use `curl -v http://localhost:9080` and you'll see at least the `x-sk-processor` header in the response, as provided by this plugin.
+- Use `curl -v http://localhost:9080 -H "x-sk: abc` and you'll see at least the `x-sk` and `x-sk-processor` headers in the response, as provided by this plugin.
+  - The value of `x-sk` response header contains the current and previous value, if any.<br/>
+    Example:
+    ```shell
+❯ curl -v http://localhost:9080 -H "x-sk: abc" 2>&1 | grep "< x-sk"
+< x-sk: "abc"|"123"
+< x-sk-processor: xp4_istio_wasme_rust #3
+❯
+    ```
+- Use `curl -v http://localhost:9080/hello` and you'll see that, besides these two headers, the response is provided by this plugin, not even reaching the target service.
+- Use `curl -v http://localhost:9080/hello -H "authority: whatever"` to see additionally that the value of that request header is reflected back in the `x-hello` response header.
+
+#### Logging
+
+Note that by default the Envoy that runs into the `istio-proxy` container has the `info` logging level. If you want to see those debug level statements that are logged by the plugin, you need to update the logging level.<br/>
+For this, use `istioctl pc log echoserver-v1-fcd7dc747-2ssm8 --level wasm:debug`<br/>
+That `echoserver-v1-fcd7dc747-2ssm8` is just one of the pods where the sample app runs.
+
+<br/>

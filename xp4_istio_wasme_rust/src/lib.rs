@@ -1,5 +1,3 @@
-use std::string;
-
 use log::debug;
 use proxy_wasm::traits::*;
 use proxy_wasm::types::*;
@@ -19,14 +17,20 @@ impl RootContext for HttpHeadersRoot {
     }
 
     fn create_http_context(&self, context_id: u32) -> Option<Box<dyn HttpContext>> {
-        Some(Box::new(HttpHeaders { context_id }))
+        Some(Box::new(HttpHeaders {
+            context_id,
+            curr_shared_key: None,
+            prev_shared_key: None,
+        }))
     }
 }
 
-const SHARED_KEY_HEADER: &str = "sk";
+const SHARED_KEY_HEADER: &str = "x-sk";
 
 struct HttpHeaders {
     context_id: u32,
+    curr_shared_key: Option<String>,
+    prev_shared_key: Option<String>,
 }
 
 impl Context for HttpHeaders {}
@@ -38,20 +42,34 @@ impl HttpContext for HttpHeaders {
         }
 
         if let Some(sk) = self.get_http_request_header(SHARED_KEY_HEADER) {
-            let (data_opt, cas) = &self.get_shared_data(SHARED_KEY_HEADER);
+            self.curr_shared_key = Some(sk);
             // cas (abreviation for compare-and-switch) is used when updating the value.
+            let (prev_sk_opt, cas) = &self.get_shared_data(SHARED_KEY_HEADER);
+
             debug!(
                 "#{} -> received {}={:?}",
-                self.context_id, SHARED_KEY_HEADER, data_opt
+                self.context_id, SHARED_KEY_HEADER, prev_sk_opt
             );
-            let resp_sk = match data_opt {
-                Some(prev_data) => format!("{:?}|{:?}", prev_data, sk),
-                None => sk,
+
+            match prev_sk_opt {
+                Some(prev_sk) => {
+                    self.prev_shared_key = Some(
+                        std::str::from_utf8(prev_sk.clone().as_slice())
+                            .unwrap_or_default()
+                            .to_string(),
+                    )
+                }
+                None => (),
             };
-            match &self.set_shared_data(SHARED_KEY_HEADER, Some(resp_sk.as_bytes()), *cas) {
-                Ok(_) => debug!(
-                    "#{} -> set {}={}",
-                    self.context_id, SHARED_KEY_HEADER, resp_sk
+
+            match &self.set_shared_data(
+                SHARED_KEY_HEADER,
+                Some(self.curr_shared_key.as_ref().unwrap().as_bytes()),
+                *cas,
+            ) {
+                Ok(()) => debug!(
+                    "#{} -> set {}={:?}",
+                    self.context_id, SHARED_KEY_HEADER, &self.curr_shared_key
                 ),
                 Err(e) => debug!(
                     "#{} -> failed to set {} due to '{:?}'",
@@ -74,22 +92,28 @@ impl HttpContext for HttpHeaders {
     }
 
     fn on_http_response_headers(&mut self, _: usize, _: bool) -> Action {
-        let mut authority = "";
+        let res_sk = match &self.curr_shared_key {
+            Some(curr_sk) => match &self.prev_shared_key {
+                Some(prev_sk) => Some(format!("{:?}|{:?}", curr_sk, prev_sk)),
+                None => Some(curr_sk.clone()),
+            },
+            None => match &self.prev_shared_key {
+                Some(prev_sk) => Some(format!("{:?}", prev_sk)),
+                None => None,
+            },
+        };
+        self.set_http_response_header(SHARED_KEY_HEADER, res_sk.as_deref());
+
+        self.set_http_response_header(
+            "x-sk-processor",
+            Some(&format!("xp4_istio_wasme_rust #{}", self.context_id)),
+        );
+
         let headers = self.get_http_request_headers();
         for (name, value) in &headers {
             debug!("#{} <- {}: {}", self.context_id, name, value);
-            if name == "authority" {
-                authority = value.as_str();
-            }
         }
-        self.set_http_response_header("x-hello", Some(&format!("Hello {}", authority)));
-        self.set_http_response_header(
-            "",
-            Some(&format!(
-                "xp3_istio_wasme_rust_hello_header #{}",
-                self.context_id
-            )),
-        );
+
         Action::Continue
     }
 
