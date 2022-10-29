@@ -64,8 +64,9 @@ From the usage perspective, here are the options:
     < x-sk-processor: xp4_istio_wasme_rust #3
     ❯
     ```
-- Use `curl -v http://localhost:9080/hello` and you'll see that, besides these two headers, the response is provided by this plugin, not even reaching the target service.
-- Use `curl -v http://localhost:9080/hello -H "authority: whatever"` to see additionally that the value of that request header is reflected back in the `x-hello` response header.
+- Use `curl -v http://localhost:9080/hello` (optionally with that `x-sk` header in the request, as in the previous example) and you'll see that, besides these two headers, the response is provided by this plugin, not even reaching the target service.
+
+<br/>
 
 #### Logging
 
