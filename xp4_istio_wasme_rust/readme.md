@@ -35,6 +35,8 @@ The data exchanged between the host and VM is done in binary format, therefore, 
 
 These are the same as in experiment no. 3 (in `xp3_` sibling location).
 
+<br/>
+
 ### Build & Publish
 
 Use `make tag=v0.1 all` as an example (specific to my dxps account).
@@ -57,10 +59,10 @@ From the usage perspective, here are the options:
   - The value of `x-sk` response header contains the current and previous value, if any.<br/>
     Example:
     ```shell
-❯ curl -v http://localhost:9080 -H "x-sk: abc" 2>&1 | grep "< x-sk"
-< x-sk: "abc"|"123"
-< x-sk-processor: xp4_istio_wasme_rust #3
-❯
+    ❯ curl -v http://localhost:9080 -H "x-sk: abc" 2>&1 | grep "< x-sk"
+    < x-sk: "abc"|"123"
+    < x-sk-processor: xp4_istio_wasme_rust #3
+    ❯
     ```
 - Use `curl -v http://localhost:9080/hello` and you'll see that, besides these two headers, the response is provided by this plugin, not even reaching the target service.
 - Use `curl -v http://localhost:9080/hello -H "authority: whatever"` to see additionally that the value of that request header is reflected back in the `x-hello` response header.
