@@ -2,12 +2,14 @@
 name = "xp4_istio_wasme_rust"
 version = "0.1.0"
 edition = "2021"
+authors = [ "dxps <marius.ileana@gmail.com" ]
+license = "Apache-2.0"
+keywords = [ "istio-proxy", "proxy-wasm", "wasm" ]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
   
 [lib]
 path = "src/lib.rs"
-crate-type = ["cdylib"]
+crate-type = [ "cdylib" ]
 
 
 [dependencies]
