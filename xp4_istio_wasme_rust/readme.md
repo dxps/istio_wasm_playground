@@ -33,7 +33,7 @@ The data exchanged between the host and VM is done in binary format, therefore, 
 
 ### Prereqs
 
-These are the same as in experiment no. 3 (in `xp3_` sibling location).
+The prerequisites are the same as in experiment no. 3 (that is [`xp3_...`](../xp3_istio_wasme_rust_hello_header/) sibling location).
 
 <br/>
 
