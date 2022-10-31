@@ -1,17 +1,36 @@
+use config::CsClientConfig;
 use log::debug;
+mod config;
+
 use proxy_wasm::traits::*;
 use proxy_wasm::types::*;
 
 proxy_wasm::main! {{
     proxy_wasm::set_log_level(LogLevel::Trace);
-    proxy_wasm::set_root_context(|_| -> Box<dyn RootContext> { Box::new(HttpHeadersRoot) });
+    proxy_wasm::set_root_context(|_| -> Box<dyn RootContext> {
+        Box::new(HttpHeadersRoot {
+            config: config::CsClientConfig::default() })
+    });
 }}
 
-struct HttpHeadersRoot;
+struct HttpHeadersRoot {
+    config: config::CsClientConfig,
+}
 
 impl Context for HttpHeadersRoot {}
 
 impl RootContext for HttpHeadersRoot {
+    fn on_configure(&mut self, _plugin_config_size: usize) -> bool {
+        if let Some(config_bytes) = self.get_plugin_configuration() {
+            if let Some(config) = CsClientConfig::new_from_config_bytes(config_bytes) {
+                debug!("[on_configure] Loaded config: {:?}", config);
+                self.config = config;
+                return true;
+            }
+        }
+        false
+    }
+
     fn get_type(&self) -> Option<ContextType> {
         Some(ContextType::HttpContext)
     }

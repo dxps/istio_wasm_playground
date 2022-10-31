@@ -39,15 +39,18 @@ These are the same as in experiment no. 3 (in `xp3_` sibling location).
 
 ### Build & Publish
 
-Use `make tag=v0.1 all` as an example (specific to my dxps account).
+To build and publish, use `make tag=v0.1.4 all` as an example (publishing includes dxps account specific path).
 
-Note that the `tag`'s value must be reflected in `echoserver_wasmplugin.yaml` file.
+Note that the `tag`'s value used for building and publishing must be reflected in `echoserver_wasmplugin.yaml` file before being deployed. Sure, this can be automated through scripting, to be considered.
 
 <br/>
 
 ### Deploy
 
-Use `k replace -f echoserver_wasmplugin.yaml` to "install" this plugin.
+Use `k replace -f echoserver_wasmplugin.yaml` to "install" this plugin.<br/>
+The alternative - that explicit the removal and then creation - is:
+- `k delete -f echoserver_wasmplugin.yaml`
+- `k apply -f echoserver_wasmplugin.yaml`
 
 <br/>
 

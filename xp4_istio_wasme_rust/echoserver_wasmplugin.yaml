@@ -7,4 +7,6 @@ spec:
     matchLabels:
       app: echoserver
   pluginName: istio_wasme_rust_hello
-  url: oci://webassemblyhub.io/dxps/xp4_istio_wasme_rust:v0.1.1
+  url: oci://webassemblyhub.io/dxps/xp4_istio_wasme_rust:v0.1.4
+  pluginConfig:
+    cs_endpoint: api.signicat.dev/cookiesvc/st
